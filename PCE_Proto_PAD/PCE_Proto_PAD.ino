@@ -30,7 +30,7 @@ const int Reg_Speed_Animation = 500 ;
 
 void setup() {
   Serial.begin(9600);
-  Serial.println("Ready");
+  //Serial.println("Ready");
   pinMode(Buton_1, INPUT);
   pinMode(Buton_2, INPUT);
   pinMode(Buton_3, INPUT);
@@ -72,6 +72,9 @@ void Pressed_Sending(){
             Pressed(i);
         }
         else{
+            Strip[i] = CHSV(Color_Reg, 255, 255);
+            FastLED.show();
+            delay(500);
             Register_animation(i) ;
         }
       }
@@ -93,8 +96,12 @@ void Time_Update(){
 }
 
 void Register_animation(int i){
+    Serial.print("R");
+    Serial.println(i+1);
     Receive_Check();
-    while(Message != i+1 ){
+    Get_State() ;
+    
+    while(State[i] != true){
         Strip[i] = CHSV(Color_Reg, 255, 255);
         delay(Reg_Speed_Animation);
         FastLED.show();
@@ -102,15 +109,18 @@ void Register_animation(int i){
         delay(Reg_Speed_Animation);
         FastLED.show();
         Receive_Check();
+        Get_State() ;
     }
     Message = 0 ; 
+    Serial.print("S");
+    Serial.println(i+1);
+    delay(1000);
 }
 
 void Pressed(int i){
     Receive_Check();
     Serial.print("P");
     Serial.println(i+1);
-    
     while(Message != i+1){
             Strip[i] = CHSV(Color_Pressed, 255, 255);
             FastLED.show();
@@ -119,8 +129,6 @@ void Pressed(int i){
     Strip[i] = CRGB::Black ;
     FastLED.show();
     Message = 0 ;
-    
-    
 }
 
 //------------------------------------------------------------------------------------------------------------------------------
